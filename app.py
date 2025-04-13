@@ -48,4 +48,4 @@ else:
 if st.button("🔘 Forzar alimentación manual"):
     st.info("⚠️ Alimentación manual activada.")
 
-st.caption("Versión interactiva - Datos simulados - SmartFeedAI - by Prido")
+st.caption("Versión interactiva - Datos simulados - SmartFeedAI - by CreativoChile")

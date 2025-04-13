@@ -8,33 +8,20 @@ st_autorefresh(interval=3000, key="datarefresh")
 st.title("🐟 SmartFeedAI - Panel de Simulación")
 
 # -------- Fila 1 - SENSORES --------
-if is_mobile:
-    st.markdown("### 🌊 Entorno Marino")
+col1, col2 = st.columns(2)
+
+with col1:
+    st.header("🌊 Entorno Marino")
     salinidad = st.slider("Salinidad del agua (ppt)", 20.0, 40.0, 30.0)
     temperatura_agua = st.slider("Temperatura del agua (°C)", 5.0, 20.0, 12.0)
     oxigeno = st.slider("Nivel de oxígeno (mg/L)", 4.0, 12.0, 8.0)
     ph = st.slider("pH del agua", 6.0, 9.0, 7.5)
 
-    st.markdown("### 🐠 Peces")
+with col2:
+    st.header("🐠 Peces")
     actividad_peces = st.slider("Nivel de actividad (0 = quietos, 10 = muy activos)", 0, 10, 5)
     nivel_estres = st.slider("Nivel de estrés (0 = relajados, 10 = muy estresados)", 0, 10, 3)
     hambre = st.slider("Nivel de hambre (0 = sin hambre, 10 = muy hambrientos)", 0, 10, 6)
-
-else:
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.header("🌊 Entorno Marino")
-        salinidad = st.slider("Salinidad del agua (ppt)", 20.0, 40.0, 30.0)
-        temperatura_agua = st.slider("Temperatura del agua (°C)", 5.0, 20.0, 12.0)
-        oxigeno = st.slider("Nivel de oxígeno (mg/L)", 4.0, 12.0, 8.0)
-        ph = st.slider("pH del agua", 6.0, 9.0, 7.5)
-
-    with col2:
-        st.header("🐠 Peces")
-        actividad_peces = st.slider("Nivel de actividad (0 = quietos, 10 = muy activos)", 0, 10, 5)
-        nivel_estres = st.slider("Nivel de estrés (0 = relajados, 10 = muy estresados)", 0, 10, 3)
-        hambre = st.slider("Nivel de hambre (0 = sin hambre, 10 = muy hambrientos)", 0, 10, 6)
 
 # -------- Fila 2 - Recomendación --------
 st.divider()

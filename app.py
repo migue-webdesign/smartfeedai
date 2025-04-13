@@ -1,18 +1,11 @@
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 from datetime import datetime
-st.set_page_config(layout="wide")
 
-# Refresca cada 3 segundos
+st.set_page_config(layout="wide")
 st_autorefresh(interval=3000, key="datarefresh")
 
 st.title("🐟 SmartFeedAI - Panel de Simulación")
-
-# Detectar tamaño de pantalla
-screen_width = st.get_option("browser.clientWidth")
-
-# Estilo adaptable
-is_mobile = screen_width is not None and screen_width < 768
 
 # -------- Fila 1 - SENSORES --------
 if is_mobile:

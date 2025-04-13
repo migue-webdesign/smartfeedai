@@ -1,12 +1,11 @@
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
+from datetime import datetime
 
 # Refresca automáticamente cada 3 segundos
 st_autorefresh(interval=3000, key="datarefresh")
 
 st.title("🐟 SmartFeedAI - Panel de Simulación")
-
-st.markdown("Simulador de sensores para alimentar salmones de forma inteligente.")
 
 # --- ENTORNO MARINO ---
 st.header("🌊 Entorno Marino")
@@ -40,3 +39,28 @@ def decidir_alimentacion(actividad, hambre, oxigeno, estres):
 
 recomendacion = decidir_alimentacion(actividad_peces, hambre, oxigeno, nivel_estres)
 st.subheader(recomendacion)
+
+# --- HISTORIAL DE SIMULACIÓN ---
+st.header("📋 Historial de Recomendaciones")
+
+# Inicializamos la variable en session_state si no existe
+if "historial" not in st.session_state:
+    st.session_state.historial = []
+
+# Agregamos un nuevo registro
+st.session_state.historial.append({
+    "Hora": datetime.now().strftime("%H:%M:%S"),
+    "Actividad": actividad_peces,
+    "Hambre": hambre,
+    "Oxígeno": oxigeno,
+    "Estrés": nivel_estres,
+    "Recomendación": recomendacion
+})
+
+# Mostrar tabla
+st.dataframe(st.session_state.historial, use_container_width=True)
+
+# Botón para limpiar historial
+if st.button("🧹 Limpiar historial"):
+    st.session_state.historial = []
+    st.experimental_rerun()

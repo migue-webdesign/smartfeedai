@@ -1,66 +1,100 @@
 import streamlit as st
-from streamlit_autorefresh import st_autorefresh
+import plotly.graph_objects as go
+import pandas as pd
 from datetime import datetime
+import random
 
-# Refresca automáticamente cada 3 segundos
-st_autorefresh(interval=3000, key="datarefresh")
+# Estilos personalizados
+st.set_page_config(page_title="Dashboard Alimentador", layout="wide", initial_sidebar_state="expanded")
 
-st.title("🐟 SmartFeedAI - Panel de Simulación")
+# CSS personalizado
+st.markdown("""
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+        }
+        .reportview-container {
+            background: #111;
+        }
+        header {
+            background-color: #111;
+        }
+        footer {
+            visibility: hidden;
+        }
+        .footer:after {
+            content:'Desarrollado por Miguel 🐟 | Proyecto ESP32 + Dashboard';
+            visibility: visible;
+            display: block;
+            position: relative;
+            padding: 10px;
+            text-align: center;
+            color: #888;
+        }
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
+    <div class="logo">
+        <img src="https://i.imgur.com/7b6nbHR.png" width="100"/>
+    </div>
+    <div class="footer"></div>
+""", unsafe_allow_html=True)
 
-# --- ENTORNO MARINO ---
-st.header("🌊 Entorno Marino")
+# Título principal
+st.title("📊 Alimentador Automático de Peces")
 
-salinidad = st.slider("Salinidad del agua (ppt)", 20.0, 40.0, 30.0)
-temperatura_agua = st.slider("Temperatura del agua (°C)", 5.0, 20.0, 12.0)
-oxigeno = st.slider("Nivel de oxígeno (mg/L)", 4.0, 12.0, 8.0)
-ph = st.slider("pH del agua", 6.0, 9.0, 7.5)
+# Simulación de datos
+def generate_data():
+    now = datetime.now().strftime("%H:%M:%S")
+    temp = round(random.uniform(8, 15), 2)
+    actividad = round(random.uniform(0.2, 0.9), 2)
+    turbidez = round(random.uniform(0.1, 0.8), 2)
+    return now, temp, actividad, turbidez
 
-# --- PECES ---
-st.header("🐠 Peces")
+times = []
+temps = []
+actividades = []
+turbideces = []
 
-actividad_peces = st.slider("Nivel de actividad (0 = quietos, 10 = muy activos)", 0, 10, 5)
-nivel_estres = st.slider("Nivel de estrés (0 = relajados, 10 = muy estresados)", 0, 10, 3)
-hambre = st.slider("Nivel de hambre (0 = sin hambre, 10 = muy hambrientos)", 0, 10, 6)
+for _ in range(30):
+    t, temp, act, turb = generate_data()
+    times.append(t)
+    temps.append(temp)
+    actividades.append(act)
+    turbideces.append(turb)
 
-# --- LÓGICA DE DECISIÓN ---
-st.header("🤖 Recomendación Inteligente de Alimentación")
-
-def decidir_alimentacion(actividad, hambre, oxigeno, estres):
-    if oxigeno < 5.5:
-        return "⚠️ No alimentar: Bajo nivel de oxígeno en el agua."
-    elif estres > 7:
-        return "🚫 No alimentar: Peces muy estresados."
-    elif actividad > 6 and hambre > 6:
-        return "✅ Recomendación: ¡Alimentar ahora!"
-    elif actividad > 4 and hambre > 4:
-        return "🟡 Esperar un poco más o reducir cantidad de alimento."
-    else:
-        return "❌ No alimentar por ahora."
-
-recomendacion = decidir_alimentacion(actividad_peces, hambre, oxigeno, nivel_estres)
-st.subheader(recomendacion)
-
-# --- HISTORIAL DE SIMULACIÓN ---
-st.header("📋 Historial de Recomendaciones")
-
-# Inicializamos la variable en session_state si no existe
-if "historial" not in st.session_state:
-    st.session_state.historial = []
-
-# Agregamos un nuevo registro
-st.session_state.historial.append({
-    "Hora": datetime.now().strftime("%H:%M:%S"),
-    "Actividad": actividad_peces,
-    "Hambre": hambre,
-    "Oxígeno": oxigeno,
-    "Estrés": nivel_estres,
-    "Recomendación": recomendacion
+df = pd.DataFrame({
+    "Hora": times,
+    "Temperatura (°C)": temps,
+    "Actividad (hambre)": actividades,
+    "Turbidez": turbideces
 })
 
-# Mostrar tabla
-st.dataframe(st.session_state.historial, use_container_width=True)
+# Visualización
+col1, col2 = st.columns(2)
 
-# Botón para limpiar historial
-if st.button("🧹 Limpiar historial"):
-    st.session_state.historial = []
-    st.experimental_rerun()
+with col1:
+    st.subheader("🌡️ Temperatura del Agua")
+    fig_temp = go.Figure()
+    fig_temp.add_trace(go.Scatter(x=df["Hora"], y=df["Temperatura (°C)"], mode="lines+markers", name="Temp"))
+    fig_temp.update_layout(template="plotly_dark", height=300)
+    st.plotly_chart(fig_temp, use_container_width=True)
+
+with col2:
+    st.subheader("🐟 Nivel de Actividad / Hambre")
+    fig_act = go.Figure()
+    fig_act.add_trace(go.Scatter(x=df["Hora"], y=df["Actividad (hambre)"], mode="lines+markers", name="Actividad"))
+    fig_act.update_layout(template="plotly_dark", height=300)
+    st.plotly_chart(fig_act, use_container_width=True)
+
+st.subheader("🌊 Nivel de Turbidez del Agua")
+fig_turb = go.Figure()
+fig_turb.add_trace(go.Scatter(x=df["Hora"], y=df["Turbidez"], mode="lines+markers", name="Turbidez"))
+fig_turb.update_layout(template="plotly_dark", height=300)
+st.plotly_chart(fig_turb, use_container_width=True)
+
+# Footer (ya agregado por CSS arriba)
